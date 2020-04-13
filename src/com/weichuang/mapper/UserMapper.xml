@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.weichuang.mapper.UserMapper">
+
+    <select id="getAllUser" resultType="User">
+        select * from t_user
+    </select>
+    <resultMap id="user_map" type="User">
+        <result property="orderNo" column="order_no"></result>
+    </resultMap>
+    <!--#{}是Mybatis中获取参数的语法-->
+    <select id="getUserById" parameterType="Integer" resultMap="user_map">
+        select * from t_user where id = #{id}
+    </select>
+
+    <insert id="addUser" parameterType="User">
+        insert into t_user values( null , #{username} , #{password})
+    </insert>
+
+    <select id="getUsersByQueryVo" parameterType="QueryVo" resultType="User">
+        select * from t_user where username like "%"#{user.username}"%"
+    </select>
+
+    <select id="getUserCount" resultType="Integer">
+        select count(*) from t_user
+    </select>
+
+    <sql id="user_sql">select * from t_user</sql>
+    <select id="getUsersByNameAndSex" resultType="User">
+        <include refid="user_sql"></include>
+        <!--默认帮我们去掉多余的前and-->
+        <where>
+            <if test="name != null and name != ''">
+                and username = #{name}
+            </if>
+            <if test="sex != null and sex != ''">
+                and sex = #{sex}
+            </if>
+        </where>
+    </select>
+    <select id="getUsersByIds" resultMap="user_map" >
+        select * from t_user
+        <where>
+            <foreach collection="list" open="id in (" close=")" separator="," item="id">
+                #{id}
+            </foreach>
+        </where>
+    </select>
+</mapper>
